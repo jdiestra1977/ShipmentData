@@ -144,14 +144,15 @@ mapasRed<-plot_grid(outD,inD,ncol=1,labels = "auto",label_size = 23)
 
 fig1<-plot_grid(mapasRed,degDist,ncol=2,rel_widths = c(1.8,1),labels = c("","c"),
                 label_size = 23)
-
+1+1
 ggsave(fig1,file="Figure1.png",width = 16,height=8)
 
 ### Outbreak data
 
 outbreaks<-read.csv("outbreaks.csv",header = T)
+nrow(outbreaks)
 
-outbreaksFreq<-outbreaks %>% select(-Latitude,-Longitude) %>% 
+outbreaksFreq<-outbreaks %>% select(-Latitude,-Longitude,-Date) %>% 
   group_by(epiunitID,serotype) %>%
   dplyr::summarise(Outbreaks=n())
 
@@ -161,7 +162,7 @@ outbreaksFreq$serotype<-factor(outbreaksFreq$serotype,levels = c("Asia-1","A","O
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", 
                "#D55E00", "#CC79A7")
 
-juntos<-outbreaks %>% select(-serotype,-Latitude,-Longitude) %>%
+juntos<-outbreaks %>% select(-serotype,-Latitude,-Longitude,-Date) %>%
   group_by(epiunitID) %>% 
   dplyr::summarise(Outbreaks=n()) %>% 
   ggplot(aes(x=as.factor(Outbreaks),y=..count..))+
@@ -185,6 +186,9 @@ separados<-ggplot(outbreaksFreq,aes(x=as.factor(Outbreaks),fill=factor(serotype)
 uno<-plot_grid(juntos,separados,rel_widths = c(1,3),labels = c("a","b"),
                label_size = 30)
 
+TUR0<-readRDS("gadm36_TUR_0_sp.rds")
+TUR_for0<-fortify(TUR0)
+
 mapas<-ggplot(TUR_for) +
   theme_void()+
   geom_polygon( aes(x = long, y = lat, group = group),
@@ -198,28 +202,28 @@ dos<-plot_grid(uno,mapas,rel_heights = c(1,1.3),ncol = 1,labels = c("","c"),labe
 ggsave(dos,file="Figure2.png",width = 16,height = 11)
 
 ### Correlation network - outbreaks
-freqOfOutbreaksAll<-outbreaks %>% select(-serotype,-Latitude,-Longitude) %>%
+freqOfOutbreaksAll<-outbreaks %>% select(-serotype,-Latitude,-Longitude,Date) %>%
   group_by(epiunitID) %>% 
   dplyr::summarise(Outbreaks=n()) %>% arrange(desc(Outbreaks)) %>% 
   subset(.,Outbreaks>=5)
 
 freqOfOutbreaksA<-outbreaks %>% 
   subset(serotype=="A") %>%
-  select(-serotype,-Latitude,-Longitude) %>%
+  select(-serotype,-Latitude,-Longitude,-Date) %>%
   group_by(epiunitID) %>% 
   dplyr::summarise(Outbreaks=n()) %>% arrange(desc(Outbreaks)) %>% 
   subset(.,Outbreaks>=3)
 
 freqOfOutbreaksO<-outbreaks %>% 
   subset(serotype=="O") %>%
-  select(-serotype,-Latitude,-Longitude) %>%
+  select(-serotype,-Latitude,-Longitude,-Date) %>%
   group_by(epiunitID) %>% 
   dplyr::summarise(Outbreaks=n()) %>% arrange(desc(Outbreaks)) %>% 
   subset(.,Outbreaks>=3)
 
 freqOfOutbreaks1<-outbreaks %>% 
   subset(serotype=="1") %>%
-  select(-serotype,-Latitude,-Longitude) %>%
+  select(-serotype,-Latitude,-Longitude,-Date) %>%
   group_by(epiunitID) %>% 
   dplyr::summarise(Outbreaks=n()) %>% arrange(desc(Outbreaks)) %>% 
   subset(.,Outbreaks>=2)
